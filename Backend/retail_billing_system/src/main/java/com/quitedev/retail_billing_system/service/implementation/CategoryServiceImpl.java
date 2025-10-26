@@ -1,6 +1,8 @@
 package com.quitedev.retail_billing_system.service.implementation;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -46,5 +48,17 @@ public class CategoryServiceImpl implements CategoryService{
             .build();
         
     }
+
+    public List<CategoryResponse> read() {
+        return categoryRepository.findAll()
+                        .stream()
+                        .map(categoryEntity -> convertToResponse(categoryEntity))
+                        .collect(Collectors.toList());
+    }
     
+
+    public void deleteCategory(String categoryId) {
+        CategoryEntity exsitingCategory = categoryRepository.findByCategoryId(categoryId).orElseThrow(() -> new RuntimeException("Category not found" + categoryId));
+        categoryRepository.delete(exsitingCategory);
+    }
 }
