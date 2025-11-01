@@ -5,12 +5,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.quitedev.retail_billing_system.entity.CategoryEntity;
 import com.quitedev.retail_billing_system.io.CategoryRequest;
 import com.quitedev.retail_billing_system.io.CategoryResponse;
 import com.quitedev.retail_billing_system.repository.CategoryRepository;
 import com.quitedev.retail_billing_system.service.CategoryService;
+import com.quitedev.retail_billing_system.service.FileUploadService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,10 +21,13 @@ import lombok.RequiredArgsConstructor;
 public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
+    private final FileUploadService fileUploadService;
 
     @Override
-    public CategoryResponse add(CategoryRequest categoryRequest) {
+    public CategoryResponse add(CategoryRequest categoryRequest, MultipartFile file) {
+        String imgUrl = fileUploadService.uploadFile(file);
         CategoryEntity newCategory = convertToEntity(categoryRequest);
+        newCategory.setImgUrl(imgUrl);
         newCategory = categoryRepository.save(newCategory);
         return convertToResponse(newCategory);
     }
@@ -59,6 +64,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     public void deleteCategory(String categoryId) {
         CategoryEntity exsitingCategory = categoryRepository.findByCategoryId(categoryId).orElseThrow(() -> new RuntimeException("Category not found" + categoryId));
+        fileUploadService.deleteFile(exsitingCategory.getImgUrl());
         categoryRepository.delete(exsitingCategory);
     }
 }
