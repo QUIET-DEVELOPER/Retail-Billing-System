@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const addCategory = async (category) => {
-    return await axios.post('http://localhost:8080/api/v1.0/categories/', category);
+    return await axios.post('http://localhost:8080/api/v1.0/categories', category);
 }
 
 export const deleteCategory = async (categoryId) => {
@@ -9,5 +9,5 @@ export const deleteCategory = async (categoryId) => {
 }
 
 export const fetchCategories = async () => {
-    return await axios.get('http://localhost:8080/api/v1.0/categories/');
+    return await axios.get('http://localhost:8080/api/v1.0/categories');
 }
