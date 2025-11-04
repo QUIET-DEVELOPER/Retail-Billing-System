@@ -1,15 +1,33 @@
 import { useContext, useState } from "react";
 import './CategoryList.css';
 import { AppContext } from "../../context/AppContext";
+import {deleteCategory} from "../../service/CategoryService.js";
+import toast from "react-hot-toast";
 
 
 const CategoryList = () => {
-  const {categories} = useContext(AppContext);
+  const {categories, setCategories} = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCategories = categories.filter(category => 
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
+
+  const deleteByCategoryId = async (categoryId) => {
+    try {
+      const response = await deleteCategory(categoryId);
+      if(response.status === 204) {
+        const updatedCategories = categories.filter(category => category.categoryId !== categoryId);
+        setCategories(updatedCategories);
+        toast.success("Category deleted");
+      } else {
+        toast.error("Unable to delete  category");
+      }
+    } catch(error) {
+      console.error(error);
+      toast.error("Unable to delete category");
+    }
+  }
 
   return (
     <div className="category-list-container" style={{height:"100vh", overflowY:"auto", overflowX:'hidden'}}>
@@ -34,7 +52,7 @@ const CategoryList = () => {
                   <p className="mb-0 text-white">{category.items} Items</p>
                 </div>
                 <div>
-                  <button className="btn btn-danger btn-sm">
+                  <button className="btn btn-danger btn-sm" onClick={() => deleteByCategoryId(category.categoryId)}>
                     <i className="bi bi-trash"></i>
                   </button>
                 </div>
